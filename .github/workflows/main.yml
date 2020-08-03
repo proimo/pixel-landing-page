@@ -37,7 +37,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
-        repository: proimo/pixel-landing-page/image
+        repository: proimo/pixel-landing-page/pixel-image
         tag_with_sha: true
         tags: latest
 
