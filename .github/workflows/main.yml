@@ -1,0 +1,51 @@
+name: Proimo Pixel Landing Page
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Setup Node.js 12.8
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.8
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build --prod --unsafe-perm
+
+    - name: Push to GitHub Packages
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: docker.pkg.github.com
+        repository: proimo/pixel-landing-page/image
+        tag_with_sha: true
+        tags: latest
+
+    - name: Pull & run image on server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: ${{ secrets.PORT }}
+        KEY: ${{ secrets.SSHKEY }}
+        script: sudo /opt/deploy/_deploy.sh /home/docker/pixel-landing-page
