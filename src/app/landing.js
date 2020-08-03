@@ -37,7 +37,7 @@ function attachListeners() {
 
 function attachListenerToCard(i) {
     cards[i].addEventListener('click', function (e) {
-        var card = getCardElement(e.target);
+        const card = getCardElement(e.target);
         onCardClick(card, i);
     })
 }
